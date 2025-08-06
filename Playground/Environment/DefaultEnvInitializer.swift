@@ -70,8 +70,7 @@ public class DefaultEnvInitializer: PlaygroundEnvInitializer {
             let configData = try Data(contentsOf: configURL)
             let config = try JSONDecoder().decode(Config.self, from: configData)
             return PlainTextAPIKeyProvider(
-                apiKey: config.apiKey,
-                huggingFaceToken: config.huggingFaceToken
+                apiKey: config.apiKey
             )
         } catch {
             print("Warning: Failed to load config.json: \(error). Using default API key.")
@@ -89,7 +88,6 @@ public class DefaultEnvInitializer: PlaygroundEnvInitializer {
 /// Configuration structure for API keys
 private struct Config: Codable {
     let apiKey: String
-    let huggingFaceToken: String?
 }
 
 /// A simple API key provider that stores keys as plain text.
@@ -101,13 +99,8 @@ private class PlainTextAPIKeyProvider: APIKeyProvider {
     public let apiKey: String?
     public let huggingFaceToken: String?
     
-    init(apiKey: String, huggingFaceToken: String? = nil) {
+    init(apiKey: String) {
         self.apiKey = apiKey.isEmpty ? nil : apiKey
-        // huggingFaceToken is optional
-        if let huggingFaceToken {
-            self.huggingFaceToken = huggingFaceToken.isEmpty ? nil : huggingFaceToken
-        } else {
-            self.huggingFaceToken = nil
-        }
+        self.huggingFaceToken = nil
     }
 }

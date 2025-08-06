@@ -41,8 +41,7 @@ In order to unlock the SDK, you will need to provide your API key. You can creat
 2. Edit `Playground/Resources/config.json` and replace `YOUR_API_KEY_HERE` with your actual API key:
    ```json
    {
-       "apiKey": "your_actual_api_key_here",
-       "huggingFaceToken": null
+       "apiKey": "your_actual_api_key_here"
    }
    ```
 
