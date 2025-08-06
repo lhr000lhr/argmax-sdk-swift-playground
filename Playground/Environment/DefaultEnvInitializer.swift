@@ -55,14 +55,41 @@ import ArgmaxSecrets
 public class DefaultEnvInitializer: PlaygroundEnvInitializer {
 
     public func createAPIKeyProvider() -> APIKeyProvider {
-        return PlainTextAPIKeyProvider(
-            apiKey: "" // TODO: Add your WhisperKitPro API key here
-        )
+        return loadAPIKeyProviderFromConfig()
+    }
+    
+    private func loadAPIKeyProviderFromConfig() -> APIKeyProvider {
+        guard let configURL = Bundle.main.url(forResource: "config", withExtension: "json") else {
+            print("Warning: config.json not found. Using default API key.")
+            return PlainTextAPIKeyProvider(
+                apiKey: "" // Fallback API key
+            )
+        }
+        
+        do {
+            let configData = try Data(contentsOf: configURL)
+            let config = try JSONDecoder().decode(Config.self, from: configData)
+            return PlainTextAPIKeyProvider(
+                apiKey: config.apiKey,
+                huggingFaceToken: config.huggingFaceToken
+            )
+        } catch {
+            print("Warning: Failed to load config.json: \(error). Using default API key.")
+            return PlainTextAPIKeyProvider(
+                apiKey: "" // Fallback API key
+            )
+        }
     }
 
     public func createAnalyticsLogger() -> AnalyticsLogger {
         return NoOpAnalyticsLogger()
     }
+}
+
+/// Configuration structure for API keys
+private struct Config: Codable {
+    let apiKey: String
+    let huggingFaceToken: String?
 }
 
 /// A simple API key provider that stores keys as plain text.
